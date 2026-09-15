@@ -1,0 +1,1000 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatística Computacional em Python</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <script src="https://cdn.jsdelivr.net/pyodide/v0.25.0/full/pyodide.js"></script>
+
+    <style>
+        :root {
+            --bg-base: #0f172a;
+            --bg-surface: #1e293b;
+            --bg-card: #334155;
+            --primary: #3b82f6;
+            --primary-hover: #2563eb;
+            --accent: #6366f1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --text-main: #f8fafc;
+            --text-muted: #94a3b8;
+            --border: #475569;
+            --code-bg: #090d16;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-base);
+            color: var(--text-main);
+            display: flex;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        sidebar {
+            width: 320px;
+            background-color: var(--bg-surface);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            user-select: none;
+        }
+
+        .brand {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(99,102,241,0.1));
+        }
+
+        .brand h1 {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .brand p {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .nav-list {
+            list-style: none;
+            overflow-y: auto;
+            flex-grow: 1;
+            padding: 10px 0;
+        }
+
+        .nav-item {
+            padding: 12px 20px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            transition: all 0.2s ease;
+            border-left: 3px solid transparent;
+        }
+
+        .nav-item:hover {
+            background-color: rgba(255,255,255,0.03);
+            color: var(--text-main);
+        }
+
+        .nav-item.active {
+            background-color: rgba(59, 130, 246, 0.12);
+            color: #60a5fa;
+            border-left-color: var(--primary);
+            font-weight: 600;
+        }
+
+        .py-status {
+            padding: 12px 20px;
+            border-top: 1px solid var(--border);
+            background-color: rgba(0,0,0,0.2);
+            font-size: 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .status-badge {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: var(--warning);
+            margin-right: 6px;
+        }
+
+        .status-badge.ready {
+            background-color: var(--success);
+            box-shadow: 0 0 8px var(--success);
+        }
+
+        main {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow-y: auto;
+            background-color: var(--bg-base);
+        }
+
+        header {
+            padding: 20px 30px;
+            background-color: var(--bg-surface);
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header h2 {
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .tab-group {
+            display: flex;
+            gap: 8px;
+            background: var(--bg-base);
+            padding: 4px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            padding: 6px 14px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 500;
+            transition: 0.2s;
+        }
+
+        .tab-btn.active {
+            background-color: var(--primary);
+            color: #fff;
+        }
+
+        .content-area {
+            padding: 30px;
+            display: grid;
+            grid-template-columns: 360px 1fr;
+            gap: 25px;
+        }
+
+        .card {
+            background-color: var(--bg-surface);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+        }
+
+        .card h3 {
+            font-size: 1rem;
+            margin-bottom: 15px;
+            color: #93c5fd;
+            border-bottom: 1px solid var(--border);
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: var(--bg-base);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text-main);
+            font-size: 0.85rem;
+            outline: none;
+            transition: 0.2s;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: 0.85rem;
+        }
+
+        .btn:hover {
+            background-color: var(--primary-hover);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results-container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .chart-box {
+            position: relative;
+            height: 380px;
+            width: 100%;
+        }
+
+        .console-box {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: #a7f3d0;
+            white-space: pre-wrap;
+            max-height: 250px;
+            overflow-y: auto;
+        }
+
+        .code-editor {
+            background-color: var(--code-bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 15px;
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.82rem;
+            color: #f1f5f9;
+            width: 100%;
+            height: 260px;
+            resize: vertical;
+            outline: none;
+            line-height: 1.5;
+        }
+
+        .math-card {
+            background-color: rgba(30, 41, 59, 0.7);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+        @media (max-width: 1024px) {
+            .content-area {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <sidebar>
+        <div class="brand">
+            <h1>Estatística Computacional</h1>
+            <p>Simulador Python - Inspirado no livro do Prof. Daniel F. Ferreira</p>
+        </div>
+        <ul class="nav-list">
+            <li class="nav-item active" onclick="switchModule(1)">
+                <span>Capítulo 1: Introdução & Matrizes</span>
+            </li>
+            <li class="nav-item" onclick="switchModule(2)">
+                <span>Capítulo 2: Geradores Uniformes (LCG)</span>
+            </li>
+            <li class="nav-item" onclick="switchModule(3)">
+                <span>Capítulo 3: Geradores Não-Uniformes</span>
+            </li>
+            <li class="nav-item" onclick="switchModule(4)">
+                <span>Capítulo 4: Amostras Multidimensionais</span>
+            </li>
+            <li class="nav-item" onclick="switchModule(5)">
+                <span>Capítulo 5: Algoritmos Estáveis (Welford)</span>
+            </li>
+            <li class="nav-item" onclick="switchModule(6)">
+                <span>Capítulo 6: Quadraturas & Newton-Raphson</span>
+            </li>
+            <li class="nav-item" onclick="switchModule(7)">
+                <span>Capítulo 7: Análise Combinatória</span>
+            </li>
+            <li class="nav-item" onclick="switchModule(8)">
+                <span>Capítulo 8: Métodos Bootstrap</span>
+            </li>
+        </ul>
+        <div class="py-status">
+            <span><span class="status-badge" id="pyBadge"></span><span id="pyStatusText">Carregando Pyodide...</span></span>
+        </div>
+    </sidebar>
+    <main>
+        <header>
+            <h2 id="moduleTitle">Capítulo 1: Introdução ao Python e Operações Matriciais</h2>
+            <div class="tab-group">
+                <button class="tab-btn active" onclick="switchTab('sim')">Simulação Interativa</button>
+                <button class="tab-btn" onclick="switchTab('code')">Código Python do Livro</button>
+                <button class="tab-btn" onclick="switchTab('math')">Fundamentação Teórica</button>
+            </div>
+        </header>
+        <div class="content-area">
+            <div class="card" id="controlPanel">
+            </div>
+            <div class="results-container">
+                <div id="tabSim" class="tab-content">
+                    <div class="math-card" id="mathBriefing">
+                    </div>
+                    <div class="card">
+                        <h3 id="chartTitle">Gráfico de Simulação</h3>
+                        <div class="chart-box">
+                            <canvas id="mainChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card" style="margin-top: 20px;">
+                        <h3>Console de Saída Computacional</h3>
+                        <div class="console-box" id="consoleOutput">Aguardando execução do algoritmo...</div>
+                    </div>
+                </div>
+                <div id="tabCode" class="tab-content" style="display: none;">
+                    <div class="card">
+                        <h3>Script Python (Editável & Executável no Navegador via WebAssembly)</h3>
+                        <textarea class="code-editor" id="pythonCodeEditor"></textarea>
+                        <button class="btn" style="margin-top: 15px;" id="btnRunCode" onclick="runCustomPython()">▶ Executar Código Python Nativo</button>
+                    </div>
+                    <div class="card" style="margin-top: 20px;">
+                        <h3>Retorno da Execução (Stdout / Pyodide)</h3>
+                        <div class="console-box" id="pythonStdout">Clique em 'Executar Código Python Nativo' para ver o log.</div>
+                    </div>
+                </div>
+
+                <div id="tabMath" class="tab-content" style="display: none;">
+                    <div class="card">
+                        <h3>Detalhamento Matemático e Algorítmico</h3>
+                        <div id="mathDetailedContent" style="line-height: 1.6; font-size: 0.9rem; color: #cbd5e1;">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        let pyodide = null;
+        let activeModule = 1;
+        let chartInstance = null;
+        async function initPyodide() {
+            const badge = document.getElementById('pyBadge');
+            const text = document.getElementById('pyStatusText');
+            try {
+                pyodide = await loadPyodide();
+                await pyodide.loadPackage(["numpy", "scipy"]);
+                badge.classList.add('ready');
+                text.innerText = "Python (Pyodide + NumPy) Pronto";
+            } catch (err) {
+                text.innerText = "Erro ao carregar Python";
+                console.error(err);
+            }
+        }
+        initPyodide();
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            
+            if (tab === 'sim') {
+                document.querySelectorAll('.tab-btn')[0].classList.add('active');
+                document.getElementById('tabSim').style.display = 'block';
+            } else if (tab === 'code') {
+                document.querySelectorAll('.tab-btn')[1].classList.add('active');
+                document.getElementById('tabCode').style.display = 'block';
+            } else if (tab === 'math') {
+                document.querySelectorAll('.tab-btn')[2].classList.add('active');
+                document.getElementById('tabMath').style.display = 'block';
+            }
+        }
+
+        function switchModule(modId) {
+            activeModule = modId;
+            document.querySelectorAll('.nav-item').forEach((item, idx) => {
+                item.classList.toggle('active', idx === (modId - 1));
+            });
+            renderModuleUI(modId);
+        }
+
+        function renderModuleUI(mod) {
+            const panel = document.getElementById('controlPanel');
+            const title = document.getElementById('moduleTitle');
+            const editor = document.getElementById('pythonCodeEditor');
+            const mathBriefing = document.getElementById('mathBriefing');
+            const mathDetailed = document.getElementById('mathDetailedContent');
+
+            if (chartInstance) chartInstance.destroy();
+
+            if (mod === 1) {
+                title.innerText = "Capítulo 1: Introdução ao Python & Álgebra Matricial";
+                mathBriefing.innerHTML = `<strong>Potência Matricial via Decomposição Espectral:</strong> \\( A^\\alpha = P \\Lambda^\\alpha P^\\top \\), onde \\( P \\) são os autovetores e \\( \\Lambda \\) os autovalores.`;
+                panel.innerHTML = `
+                    <h3>Configurar Matriz A (2x2)</h3>
+                    <div class="form-group"><label>Elemento a11:</label><input type="number" id="m11" class="form-control" value="4"></div>
+                    <div class="form-group"><label>Elemento a12 = a21 (Simétrica):</label><input type="number" id="m12" class="form-control" value="1"></div>
+                    <div class="form-group"><label>Elemento a22:</label><input type="number" id="m22" class="form-control" value="2"></div>
+                    <div class="form-group"><label>Expoente Real (α):</label><input type="number" step="0.1" id="mAlpha" class="form-control" value="0.5"></div>
+                    <button class="btn" onclick="simModule1()">Calcular Potência e Teste t</button>
+                `;
+                editor.value = `import numpy as np
+
+def mat_power(A, alpha=0.5):
+    e_val, e_vec = np.linalg.eig(A)
+    if any(e_val < 0):
+        return "Matriz não é positiva definida!"
+    Ap = e_vec.dot(np.diag(e_val**alpha)).dot(e_vec.T)
+    return Ap
+
+A = np.array([[4, 1], [1, 2]])
+print("Matriz A:\n", A)
+print("A^(1/2):\n", mat_power(A, 0.5))`;
+                mathDetailed.innerHTML = `<p>O Capítulo 1 aborda os fundamentos da linguagem Python, manipulação de matrizes com <code>numpy</code>, testes estatísticos de hipóteses e potências funcionais de matrizes simétricas positivas definidas via autodecomposição espectral.</p>`;
+                simModule1();
+            }
+            else if (mod === 2) {
+                title.innerText = "Capítulo 2: Geradores Uniformes Congruenciais (LCG)";
+                mathBriefing.innerHTML = `<strong>Método Congruencial Linear:</strong> \\( U_{i+1} = (a U_i + c) \\pmod m \\). Semente inicial \\( U_0 \\).`;
+                panel.innerHTML = `
+                    <h3>Parâmetros do LCG</h3>
+                    <div class="form-group"><label>Módulo (m):</label><input type="number" id="lcgM" class="form-control" value="16"></div>
+                    <div class="form-group"><label>Multiplicador (a):</label><input type="number" id="lcgA" class="form-control" value="5"></div>
+                    <div class="form-group"><label>Incremento (c):</label><input type="number" id="lcgC" class="form-control" value="1"></div>
+                    <div class="form-group"><label>Semente (U0):</label><input type="number" id="lcgU0" class="form-control" value="1"></div>
+                    <div class="form-group"><label>Iterações (N):</label><input type="number" id="lcgN" class="form-control" value="30"></div>
+                    <button class="btn" onclick="simModule2()">Gerar e Analisar Período</button>
+                `;
+                editor.value = `def lcg(n, a, c, m, u0):
+    seq = []
+    u = u0
+    for _ in range(n):
+        u = (a * u + c) % m
+        seq.append(u / m)
+    return seq
+
+print("Sequência Uniforme (LCG):", lcg(10, 5, 1, 16, 1))`;
+                mathDetailed.innerHTML = `<p>Geração de números pseudo-aleatórios uniformes entre [0, 1). Avaliação de peridiocidade e dispersão espectral (Lattice Test) em espaços bidimensionais.</p>`;
+                simModule2();
+            }
+            else if (mod === 3) {
+                title.innerText = "Capítulo 3: Variáveis Aleatórias Não-Uniformes";
+                mathBriefing.innerHTML = `<strong>Transformação Inversa (Exponencial):</strong> \\( X = -\\frac{1}{\\lambda} \\ln(1 - U) \\)`;
+                panel.innerHTML = `
+                    <h3>Gerador Exponencial / Aceitação-Rejeição</h3>
+                    <div class="form-group"><label>Método:</label>
+                        <select id="genMethod" class="form-control">
+                            <option value="inv">Transformação Inversa (Exponencial)</option>
+                            <option value="ar">Aceitação e Rejeição (Normal padrão via Exponencial)</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Taxa (λ) / Parâmetro:</label><input type="number" step="0.1" id="expLambda" class="form-control" value="1.5"></div>
+                    <div class="form-group"><label>Tamanho Amostral (N):</label><input type="number" id="genN" class="form-control" value="1000"></div>
+                    <button class="btn" onclick="simModule3()">Simular Amostra</button>
+                `;
+                editor.value = `import numpy as np
+
+# Método da Transformação Inversa para Exponencial
+def gen_exp(n, lam):
+    u = np.random.uniform(0, 1, n)
+    return -np.log(1 - u) / lam
+
+amostra = gen_exp(1000, 1.5)
+print("Média Amostral:", np.mean(amostra))
+print("Média Teórica:", 1/1.5)`;
+                mathDetailed.innerHTML = `<p>Simulação de variáveis contínuas via método da Inversão de CDF \\( X = F^{-1}(U) \\) e método de Aceitação e Rejeição (Von Neumann).</p>`;
+                simModule3();
+            }
+            else if (mod === 4) {
+                title.innerText = "Capítulo 4: Variáveis Multidimensionais (Normal Bivariada)";
+                mathBriefing.innerHTML = `<strong>Decomposição de Cholesky:</strong> \\( \\Sigma = L L^\\top \\Rightarrow X = \\mu + L Z \\), onde \\( Z \\sim N(0, I) \\).`;
+                panel.innerHTML = `
+                    <h3>Parâmetros Bivariados</h3>
+                    <div class="form-group"><label>Média X1 (μ1):</label><input type="number" id="mu1" class="form-control" value="0"></div>
+                    <div class="form-group"><label>Média X2 (μ2):</label><input type="number" id="mu2" class="form-control" value="0"></div>
+                    <div class="form-group"><label>Variância X1 (σ1²):</label><input type="number" id="var1" class="form-control" value="1"></div>
+                    <div class="form-group"><label>Variância X2 (σ2²):</label><input type="number" id="var2" class="form-control" value="1"></div>
+                    <div class="form-group"><label>Covariância (σ12):</label><input type="number" step="0.1" id="cov12" class="form-control" value="0.7"></div>
+                    <div class="form-group"><label>Nº de Pontos:</label><input type="number" id="mvN" class="form-control" value="500"></div>
+                    <button class="btn" onclick="simModule4()">Gerar Distribuição Normal Bivariada</button>
+                `;
+                editor.value = `import numpy as np
+
+def gen_multivariate_normal(mu, sigma, n):
+    L = np.linalg.cholesky(sigma)
+    Z = np.random.normal(0, 1, size=(n, len(mu)))
+    return mu + Z.dot(L.T)
+
+mu = np.array([0, 0])
+sigma = np.array([[1.0, 0.7], [0.7, 1.0]])
+X = gen_multivariate_normal(mu, sigma, 500)
+print("Matriz de Covariância Amostral:\n", np.cov(X.T))`;
+                mathDetailed.innerHTML = `<p>Amostragem de vetores aleatórios com estrutura de dependência linear via fatoração triangular de Cholesky.</p>`;
+                simModule4();
+            }
+            else if (mod === 5) {
+                title.innerText = "Capítulo 5: Algoritmo Numérico de Welford (Média e Variância Incremental)";
+                mathBriefing.innerHTML = `<strong>Atualização de Welford:</strong> \\( M_k = M_{k-1} + \\frac{x_k - M_{k-1}}{k} \\), \\( S_k = S_{k-1} + (x_k - M_{k-1})(x_k - M_k) \\).`;
+                panel.innerHTML = `
+                    <h3>Fluxo Dinâmico de Dados</h3>
+                    <div class="form-group"><label>Tamanho do Fluxo (N):</label><input type="number" id="welN" class="form-control" value="100"></div>
+                    <div class="form-group"><label>Média Teórica N(μ, σ²):</label><input type="number" id="welMu" class="form-control" value="50"></div>
+                    <div class="form-group"><label>Desvio Padrão Teórico (σ):</label><input type="number" id="welSigma" class="form-control" value="10"></div>
+                    <button class="btn" onclick="simModule5()">Executar Algoritmo de Welford</button>
+                `;
+                editor.value = `def welford(data):
+    count = 0
+    mean = 0.0
+    M2 = 0.0
+    history = []
+    for x in data:
+        count += 1
+        delta = x - mean
+        mean += delta / count
+        delta2 = x - mean
+        M2 += delta * delta2
+        var = M2 / (count - 1) if count > 1 else 0.0
+        history.append((mean, var))
+    return history
+
+data = [10, 20, 30, 40, 50]
+print("Histórico (Média, Variância):", welford(data))`;
+                mathDetailed.innerHTML = `<p>Algoritmos computacionais de passo único que evitam o cancelamento catastrófico na subtração de números de ponto flutuante de magnitudes elevadas.</p>`;
+                simModule5();
+            }
+            else if (mod === 6) {
+                title.innerText = "Capítulo 6: Quadraturas Gaussianas & Newton-Raphson";
+                mathBriefing.innerHTML = `<strong>Aproximação de Integral:</strong> \\( \\int_{-1}^{1} f(x) dx \\approx \\sum_{i=1}^{n} w_i f(x_i) \\)`;
+                panel.innerHTML = `
+                    <h3>Integração Numérica e Newton-Raphson</h3>
+                    <div class="form-group"><label>Função f(x):</label><input type="text" id="quadFunc" class="form-control" value="x**2 + np.sin(x)"></div>
+                    <div class="form-group"><label>Limite Inferior (a):</label><input type="number" id="quadA" class="form-control" value="0"></div>
+                    <div class="form-group"><label>Limite Superior (b):</label><input type="number" id="quadB" class="form-control" value="2"></div>
+                    <button class="btn" onclick="simModule6()">Calcular Quadratura & Raíz</button>
+                `;
+                editor.value = `import numpy as np
+
+# Quadratura Gauss-Legendre de 2 Pontos em [-1, 1]
+# Pontos: x = +- 1/sqrt(3), Pesos: w = 1
+def gauss_legendre_2pt(f, a, b):
+    # Mudança de variável para [a, b]
+    t1 = -1 / np.sqrt(3)
+    t2 = 1 / np.sqrt(3)
+    x1 = 0.5 * ((b - a) * t1 + (a + b))
+    x2 = 0.5 * ((b - a) * t2 + (a + b))
+    integral = 0.5 * (b - a) * (f(x1) + f(x2))
+    return integral
+
+f = lambda x: x**2
+print("Integral de x^2 em [0, 2]:", gauss_legendre_2pt(f, 0, 2))`;
+                mathDetailed.innerHTML = `<p>Aproximação de integrais contínuas não analíticas através dos nós e pesos de Gauss-Legendre e cálculo de estimadores de MV via Newton-Raphson.</p>`;
+                simModule6();
+            }
+            else if (mod === 7) {
+                title.innerText = "Capítulo 7: Análise Combinatória & Probabilidade";
+                mathBriefing.innerHTML = `<strong>Problema dos Aniversários:</strong> \\( P(\\text{pelo menos 2 coincidem}) = 1 - \\prod_{i=0}^{k-1} \\frac{365-i}{365} \\)`;
+                panel.innerHTML = `
+                    <h3>Simulação de Monte Carlo Combinatória</h3>
+                    <div class="form-group"><label>Nº de Pessoas no Grupo (k):</label><input type="number" id="bdayK" class="form-control" value="23"></div>
+                    <div class="form-group"><label>Simulações Monte Carlo:</label><input type="number" id="bdayN" class="form-control" value="2000"></div>
+                    <button class="btn" onclick="simModule7()">Simular Probabilidade</button>
+                `;
+                editor.value = `import numpy as np
+
+def birthday_sim(k, n_sim):
+    coincidences = 0
+    for _ in range(n_sim):
+        group = np.random.randint(1, 366, size=k)
+        if len(group) != len(set(group)):
+            coincidences += 1
+    return coincidences / n_sim
+
+print("Probabilidade Simulada (23 pessoas):", birthday_sim(23, 5000))`;
+                mathDetailed.innerHTML = `<p>Problemas combinatórios, permutação de elementos e solução empírica de paradoxos probabilísticos com contagem direta.</p>`;
+                simModule7();
+            }
+            else if (mod === 8) {
+                title.innerText = "Capítulo 8: Métodos Bootstrap Não-Paramétricos";
+                mathBriefing.innerHTML = `<strong>Intervalo de Confiança Percentil:</strong> \\( [\\hat{\\theta}_{\\alpha/2}^*, \\hat{\\theta}_{1 - \\alpha/2}^*] \\)`;
+                panel.innerHTML = `
+                    <h3>Reamostragem Bootstrap</h3>
+                    <div class="form-group"><label>Estatística de Interesse:</label>
+                        <select id="bootStat" class="form-control">
+                            <option value="mean">Média Amostral</option>
+                            <option value="median">Mediana</option>
+                            <option value="var">Variância Amostral</option>
+                        </select>
+                    </div>
+                    <div class="form-group"><label>Nº de Réplicas Bootstrap (B):</label><input type="number" id="bootB" class="form-control" value="1000"></div>
+                    <div class="form-group"><label>Nível de Confiança (%):</label><input type="number" id="bootConf" class="form-control" value="95"></div>
+                    <button class="btn" onclick="simModule8()">Gerar Distribuição Bootstrap</button>
+                `;
+                editor.value = `import numpy as np
+
+def bootstrap_ci(data, B=1000, alpha=0.05):
+    n = len(data)
+    boot_stats = []
+    for _ in range(B):
+        sample = np.random.choice(data, size=n, replace=True)
+        boot_stats.append(np.mean(sample))
+    
+    ci_lower = np.percentile(boot_stats, 100 * (alpha / 2))
+    ci_upper = np.percentile(boot_stats, 100 * (1 - alpha / 2))
+    return ci_lower, ci_upper
+
+dados = [14.2, 13.5, 15.0, 16.4, 14.8, 15.2, 16.9, 14.7]
+print("IC 95% Bootstrap (Percentil):", bootstrap_ci(dados))`;
+                mathDetailed.innerHTML = `<p>Métodos intensivos de computação para inferência estatística sem suposição de normalidade populacional, cálculo de viés e erro padrão via reamostragem.</p>`;
+                simModule8();
+            }
+            MathJax.typeset();
+        }
+
+        function simModule1() {
+            const m11 = parseFloat(document.getElementById('m11').value);
+            const m12 = parseFloat(document.getElementById('m12').value);
+            const m22 = parseFloat(document.getElementById('m22').value);
+            const alpha = parseFloat(document.getElementById('mAlpha').value);
+            const trace = m11 + m22;
+            const det = m11 * m22 - m12 * m12;
+            const l1 = trace / 2 + Math.sqrt(Math.max(0, (trace*trace)/4 - det));
+            const l2 = trace / 2 - Math.sqrt(Math.max(0, (trace*trace)/4 - det));
+
+            const consoleOut = document.getElementById('consoleOutput');
+            consoleOut.innerText = `[MATRIZ A CONFIGURADA]\n[ ${m11}  ${m12} ]\n[ ${m12}  ${m22} ]\n\n`;
+            consoleOut.innerText += `Autovalores Calculados: λ1 = ${l1.toFixed(4)}, λ2 = ${l2.toFixed(4)}\n`;
+            consoleOut.innerText += `Calculando A^(${alpha})...\n`;
+
+            if (l1 < 0 || l2 < 0) {
+                consoleOut.innerText += `ERRO: Matriz não é positiva definida (autovalores negativos).`;
+                return;
+            }
+            renderChart(['Autovalor λ1', 'Autovalor λ2', `λ1^${alpha}`, `λ2^${alpha}`], [l1, l2, Math.pow(l1, alpha), Math.pow(l2, alpha)], 'bar', 'Magnitude dos Autovalores Originais e Transformados');
+        }
+
+        function simModule2() {
+            const m = parseInt(document.getElementById('lcgM').value);
+            const a = parseInt(document.getElementById('lcgA').value);
+            const c = parseInt(document.getElementById('lcgC').value);
+            const u0 = parseInt(document.getElementById('lcgU0').value);
+            const n = parseInt(document.getElementById('lcgN').value);
+
+            let u = u0;
+            let seq = [];
+            let pointsX = [];
+            let pointsY = [];
+
+            for (let i = 0; i < n; i++) {
+                let uNext = (a * u + c) % m;
+                seq.push(uNext / m);
+                if (i > 0) {
+                    pointsX.push(u / m);
+                    pointsY.push(uNext / m);
+                }
+                u = uNext;
+            }
+
+            document.getElementById('consoleOutput').innerText = `Sequência U(0,1) Gerada (${n} valores):\n` + seq.map(v => v.toFixed(4)).join(', ');
+
+            renderScatterChart(pointsX, pointsY, 'Lattice Test Bidimensional (Ui vs Ui+1)');
+        }
+
+        function simModule3() {
+            const method = document.getElementById('genMethod').value;
+            const lam = parseFloat(document.getElementById('expLambda').value);
+            const n = parseInt(document.getElementById('genN').value);
+
+            let data = [];
+            if (method === 'inv') {
+                for (let i = 0; i < n; i++) {
+                    let u = Math.random();
+                    data.push(-Math.log(1 - u) / lam);
+                }
+            } else {
+                while (data.length < n) {
+                    let y = -Math.log(1 - Math.random()); 
+                    let u = Math.random();
+                    if (u <= Math.exp(-0.5 * Math.pow(y - 1, 2))) {
+                        data.push(Math.random() > 0.5 ? y : -y);
+                    }
+                }
+            }
+
+            const mean = data.reduce((a, b) => a + b, 0) / n;
+            document.getElementById('consoleOutput').innerText = `Amostra Gerada (N=${n})\nMédia Amostral: ${mean.toFixed(4)}\nDesvio Padrão: ${(Math.sqrt(data.reduce((a,b)=>a+Math.pow(b-mean,2),0)/n)).toFixed(4)}`;
+
+            renderHistogram(data, 20, 'Distribuição Amostral Gerada');
+        }
+
+        function simModule4() {
+            const mu1 = parseFloat(document.getElementById('mu1').value);
+            const mu2 = parseFloat(document.getElementById('mu2').value);
+            const v1 = parseFloat(document.getElementById('var1').value);
+            const v2 = parseFloat(document.getElementById('var2').value);
+            const cov = parseFloat(document.getElementById('cov12').value);
+            const n = parseInt(document.getElementById('mvN').value);
+            const l11 = Math.sqrt(v1);
+            const l21 = cov / l11;
+            const l22 = Math.sqrt(Math.max(0, v2 - l21 * l21));
+
+            let ptsX = [], ptsY = [];
+            for (let i = 0; i < n; i++) {
+                let z1 = Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random());
+                let z2 = Math.sqrt(-2 * Math.log(Math.random())) * Math.sin(2 * Math.PI * Math.random());
+
+                let x1 = mu1 + l11 * z1;
+                let x2 = mu2 + l21 * z1 + l22 * z2;
+                ptsX.push(x1);
+                ptsY.push(x2);
+            }
+
+            document.getElementById('consoleOutput').innerText = `Fatorização de Cholesky Matriz L:\n[ ${l11.toFixed(4)}   0.0000 ]\n[ ${l21.toFixed(4)}   ${l22.toFixed(4)} ]`;
+
+            renderScatterChart(ptsX, ptsY, 'Normal Multivariada (Dispersão X1 vs X2)');
+        }
+
+        function simModule5() {
+            const n = parseInt(document.getElementById('welN').value);
+            const mu = parseFloat(document.getElementById('welMu').value);
+            const sigma = parseFloat(document.getElementById('welSigma').value);
+
+            let count = 0, mean = 0, M2 = 0;
+            let meansHist = [], varsHist = [];
+
+            for (let i = 0; i < n; i++) {
+                let z = Math.sqrt(-2 * Math.log(Math.random())) * Math.cos(2 * Math.PI * Math.random());
+                let x = mu + z * sigma;
+
+                count++;
+                let delta = x - mean;
+                mean += delta / count;
+                let delta2 = x - mean;
+                M2 += delta * delta2;
+
+                meansHist.push(mean);
+                varsHist.push(count > 1 ? M2 / (count - 1) : 0);
+            }
+
+            document.getElementById('consoleOutput').innerText = `Algoritmo Finalizado.\nMédia Incremental Final: ${mean.toFixed(4)}\nVariância Incremental Final: ${varsHist[n-1].toFixed(4)}`;
+
+            renderLineChart(Array.from({length: n}, (_, i) => i + 1), meansHist, 'Convergência Incremental da Média (Welford)');
+        }
+
+        function simModule6() {
+            const a = parseFloat(document.getElementById('quadA').value);
+            const b = parseFloat(document.getElementById('quadB').value);
+            const t1 = -1 / Math.sqrt(3), t2 = 1 / Math.sqrt(3);
+            const x1 = 0.5 * ((b - a) * t1 + (a + b));
+            const x2 = 0.5 * ((b - a) * t2 + (a + b));
+            const f = x => x * x;
+            const res = 0.5 * (b - a) * (f(x1) + f(x2));
+
+            document.getElementById('consoleOutput').innerText = `Aproximação Gauss-Legendre (2 Nós) para f(x)=x²:\nResultado Numérico em [${a}, ${b}]: ${res.toFixed(6)}\nValor Analítico Exato: ${(Math.pow(b,3)/3 - Math.pow(a,3)/3).toFixed(6)}`;
+
+            renderChart(['Nó x1', 'Nó x2'], [f(x1), f(x2)], 'bar', 'Valores da Função nos Nós Gaussianos');
+        }
+
+        function simModule7() {
+            const k = parseInt(document.getElementById('bdayK').value);
+            const nSim = parseInt(document.getElementById('bdayN').value);
+
+            let coincidences = 0;
+            for (let i = 0; i < nSim; i++) {
+                let setBdays = new Set();
+                for (let j = 0; j < k; j++) {
+                    let bday = Math.floor(Math.random() * 365) + 1;
+                    if (setBdays.has(bday)) {
+                        coincidences++;
+                        break;
+                    }
+                    setBdays.add(bday);
+                }
+            }
+            const pSim = coincidences / nSim;
+            let pCompl = 1.0;
+            for (let i = 0; i < k; i++) pCompl *= (365 - i) / 365;
+            const pTeor = 1.0 - pCompl;
+
+            document.getElementById('consoleOutput').innerText = `Paradoxo do Aniversário (k=${k} pessoas):\nProbabilidade Simulada (Monte Carlo): ${(pSim * 100).toFixed(2)}%\nProbabilidade Teórica Exata: ${(pTeor * 100).toFixed(2)}%`;
+
+            renderChart(['Probabilidade Simulada', 'Probabilidade Teórica'], [pSim, pTeor], 'bar', 'Comparativo de Probabilidade de Coincidência');
+        }
+
+        function simModule8() {
+            const B = parseInt(document.getElementById('bootB').value);
+            const conf = parseFloat(document.getElementById('bootConf').value);
+            const stat = document.getElementById('bootStat').value;
+            const data = [13.4, 14.6, 13.5, 15.0, 14.6, 14.0, 16.4, 14.8, 15.2, 15.5];
+            const n = data.length;
+
+            let bootStats = [];
+            for (let b = 0; b < B; b++) {
+                let resample = [];
+                for (let i = 0; i < n; i++) {
+                    resample.push(data[Math.floor(Math.random() * n)]);
+                }
+                
+                let val = 0;
+                if (stat === 'mean') val = resample.reduce((x,y)=>x+y,0)/n;
+                else if (stat === 'var') {
+                    let m = resample.reduce((x,y)=>x+y,0)/n;
+                    val = resample.reduce((x,y)=>x+Math.pow(y-m,2),0)/(n-1);
+                }
+                bootStats.push(val);
+            }
+
+            bootStats.sort((a,b) => a - b);
+            const alpha = (100 - conf) / 100;
+            const ciLower = bootStats[Math.floor((alpha / 2) * B)];
+            const ciUpper = bootStats[Math.floor((1 - alpha / 2) * B)];
+
+            document.getElementById('consoleOutput').innerText = `Bootstrap Não-Paramétrico (${B} réplicas):\n` +
+                `Estatística: ${stat.toUpperCase()}\n` +
+                `Intervalo de Confiança Percentil (${conf}%): [${ciLower.toFixed(4)}, ${ciUpper.toFixed(4)}]`;
+
+            renderHistogram(bootStats, 20, `Distribuição Bootstrap da ${stat.toUpperCase()}`);
+        }
+        async function runCustomPython() {
+            const code = document.getElementById('pythonCodeEditor').value;
+            const stdoutBox = document.getElementById('pythonStdout');
+            stdoutBox.innerText = "Executando script Python";
+
+            if (!pyodide) {
+                stdoutBox.innerText = "Erro: O interpretador Pyodide ainda não carregou totalmente.";
+                return;
+            }
+
+            try {
+                pyodide.runPython(`
+import sys
+import io
+sys.stdout = io.StringIO()
+                `);
+                await pyodide.runPythonAsync(code);
+                let stdout = pyodide.runPython("sys.stdout.getvalue()");
+                stdoutBox.innerText = stdout || "Código executado com sucesso (sem saída no stdout).";
+            } catch (err) {
+                stdoutBox.innerText = "Erro de Execução Python:\n" + err;
+            }
+        }
+        function renderChart(labels, data, type = 'bar', title = '') {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: type,
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        backgroundColor: '#3b82f6',
+                        borderColor: '#60a5fa',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#f8fafc' } } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                    }
+                }
+            });
+        }
+
+        function renderScatterChart(xPts, yPts, title = '') {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            const points = xPts.map((x, i) => ({ x: x, y: yPts[i] }));
+            chartInstance = new Chart(ctx, {
+                type: 'scatter',
+                data: {
+                    datasets: [{
+                        label: title,
+                        data: points,
+                        backgroundColor: '#6366f1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#f8fafc' } } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                    }
+                }
+            });
+        }
+
+        function renderLineChart(labels, data, title = '') {
+            const ctx = document.getElementById('mainChart').getContext('2d');
+            if (chartInstance) chartInstance.destroy();
+            chartInstance = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: title,
+                        data: data,
+                        borderColor: '#10b981',
+                        backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                        fill: true,
+                        tension: 0.1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { labels: { color: '#f8fafc' } } },
+                    scales: {
+                        x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+                        y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+                    }
+                }
+            });
+        }
+
+        function renderHistogram(data, numBins, title = '') {
+            const min = Math.min(...data);
+            const max = Math.max(...data);
+            const step = (max - min) / numBins;
+            let bins = new Array(numBins).fill(0);
+            let labels = [];
+
+            for (let i = 0; i < numBins; i++) {
+                labels.push((min + i * step).toFixed(2));
+            }
+
+            data.forEach(val => {
+                let binIdx = Math.min(Math.floor((val - min) / step), numBins - 1);
+                if (binIdx >= 0) bins[binIdx]++;
+            });
+
+            renderChart(labels, bins, 'bar', title);
+        }
+        switchModule(1);
+    </script>
+</body>
+</html>
