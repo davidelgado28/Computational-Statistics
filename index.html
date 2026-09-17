@@ -393,7 +393,6 @@
             </div>
         </div>
     </main>
-
     <script>
         let pyodide = null;
         let activeModule = 1;
@@ -738,13 +737,11 @@ print("IC 95% Bootstrap (Percentil):", bootstrap_ci(dados))`;
                     }
                 }
             }
-
             const mean = data.reduce((a, b) => a + b, 0) / n;
             document.getElementById('consoleOutput').innerText = `Amostra Gerada (N=${n})\nMédia Amostral: ${mean.toFixed(4)}\nDesvio Padrão: ${(Math.sqrt(data.reduce((a,b)=>a+Math.pow(b-mean,2),0)/n)).toFixed(4)}`;
 
             renderHistogram(data, 20, 'Distribuição Amostral Gerada');
         }
-
         function simModule4() {
             const mu1 = parseFloat(document.getElementById('mu1').value);
             const mu2 = parseFloat(document.getElementById('mu2').value);
@@ -771,7 +768,6 @@ print("IC 95% Bootstrap (Percentil):", bootstrap_ci(dados))`;
 
             renderScatterChart(ptsX, ptsY, 'Normal Multivariada (Dispersão X1 vs X2)');
         }
-
         function simModule5() {
             const n = parseInt(document.getElementById('welN').value);
             const mu = parseFloat(document.getElementById('welMu').value);
@@ -975,7 +971,6 @@ sys.stdout = io.StringIO()
                 }
             });
         }
-
         function renderHistogram(data, numBins, title = '') {
             const min = Math.min(...data);
             const max = Math.max(...data);
