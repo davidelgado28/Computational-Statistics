@@ -403,8 +403,6 @@
             try {
                 pyodide = await loadPyodide();
                 await pyodide.loadPackage(["numpy", "scipy"]);
-                badge.classList.add('ready');
-                text.innerText = "Python (Pyodide + NumPy) Pronto";
             } catch (err) {
                 text.innerText = "Erro ao carregar Python";
                 console.error(err);
